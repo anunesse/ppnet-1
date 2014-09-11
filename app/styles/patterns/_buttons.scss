@@ -13,7 +13,18 @@
   background: $primary;
   border-color: darken($primary, 3%);
 
-  &:hover {
+  :hover {
     background: darken($primary, 5%);
+    border-color: darken($primary, 3%);
+  }
+
+  :visited {
+    background: $primary;
+  }
+
+  :active {
+    background: $primary;
   }
 }
+
+.btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active, .open > .btn-info.dropdown-toggle { border-color: darken($primary, 5%); background: darken($primary, 5%); }

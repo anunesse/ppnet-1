@@ -84,6 +84,12 @@
   button {
     @include border-top-radius(0);
   }
+
+  :disabled{
+    opacity: 1;
+    background: #9161C9;
+    border: 1px solid #9161C9;
+  }
 }
 
 .post-media-select {

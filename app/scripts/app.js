@@ -80,6 +80,10 @@ angular.module('ppnetApp', [
         controller: 'HelloworldCtrl',
         access: access.user
       })
+      .when('/schedule', {
+        templateUrl: 'views/schedule/index.html',
+        access: access.public
+      })
       .otherwise({
         controller: 'StreamController',
         templateUrl: 'views/stream.html',
