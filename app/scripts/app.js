@@ -82,6 +82,7 @@ angular.module('ppnetApp', [
       })
       .when('/schedule', {
         templateUrl: 'views/schedule/index.html',
+        controller: 'ScheduleController',
         access: access.public
       })
       .otherwise({

@@ -62,7 +62,7 @@
 <script type="text/javascript" src="views/schedule/js/jquery-migrate.min.js"></script>
 <script type="text/javascript" src="views/schedule/js/jquery.prettyPhoto.js"></script>
 
-<style type="text/css">
+<!--<style type="text/css">
 body {
   font-family: Open Sans
 }
@@ -991,7 +991,9 @@ gt
 
 .white-text {
   color: white;
-}    </style>
+}
+</style>-->
+
 </head>
 
 <body
@@ -1054,7 +1056,7 @@ gt
       </h2>
 
       <div class="">
-        <div class="clickable" ng-click="event.selected = !event.selected">{{event.subtitle}}</div>
+        <div style="cursor:pointer" class="clickable" ng-click="event.selected = !event.selected"><a>{{event.subtitle}}</a></div>
         <div class="" ng-show="event.selected">
           <div ng-bind-html="event.content"></div>
         </div>
