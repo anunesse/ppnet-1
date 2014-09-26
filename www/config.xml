@@ -20,8 +20,17 @@
     <feature name="File">
         <param name="android-package" value="org.apache.cordova.file.FileUtils" />
     </feature>
+
     <feature name="FileTransfer">
         <param name="android-package" value="org.apache.cordova.filetransfer.FileTransfer" />
+    </feature>
+
+    <feature name="StatusBar">
+        <param name="ios-package" value="CDVStatusBar" onload="true" />
+    </feature>
+
+    <feature name="GAPlugin" >
+      < param name="android-package" value="com.adobe.plugins.GAPlugin"/>
     </feature>
 
     <access origin="*" />
@@ -65,4 +74,11 @@
     <gap:plugin name="org.apache.cordova.inappbrowser" />
     <gap:plugin name="org.apache.cordova.geolocation" />
 
+    <gap:plugin name="org.apache.cordova.statusbar" />
+
+    <gap:plugin name="com.adobe.plugins.gaplugin" />
+    <gap:plugin name="NetworkStatus" value="org.apache.cordova.NetworkManager" />
+    <!--<gap:plugin name="Geolocation" value="org.apache.cordova.GeoBroker" />-->
+
+    <preference name="StatusBarOverlaysWebView" value="false" />
 </widget>

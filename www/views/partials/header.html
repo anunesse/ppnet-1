@@ -1,11 +1,16 @@
 <div class="app-header clearfix" ng-controller="configController">
 	<div class="logo">
-		<a href="#/" class="btn btn-lg">{{config.name}}</a>
+		<a href="#/" class="btn btn-lg"><img src="../../images/logo.svg" /></a>
 	</div>
-	<div class="pull-right"  ng-show="isLogedIn">
-		<a href="#/" class="btn btn-lg"><i class="fa fa-th-list"></i></a>
+	<div class="pull-right"  access-level="1">
+		<a href="#/schedule" class="btn btn-lg"><i class="fa fa-calendar"></i></a>
+	</div>
+	<div class="pull-right"  access-level="2">
+    <p>{{plip}}</p>
+		<a href="#/" ng-click="plop()" class="btn btn-lg"><i class="fa fa-th-list"></i></a>
+		<a href="#/schedule" class="btn btn-lg"><i class="fa fa-calendar"></i></a>
 		<a href="#/map" class="btn btn-lg"><i class="fa fa-map-marker"></i></a>
 		<a href="#/timeline" class="btn btn-lg"><i class="fa fa-clock-o"></i></a>
-		<a href="#/logout" ng-click="logoutButtonClick()" class="btn btn-lg"><i class="fa fa-sign-out"></i></a>
+		<a href="#/logout" ng-click="logoutButtonClick()" class="btn btn-lg"><i class="fa fa-power-off"></i></a>
 	</div>
 </div>

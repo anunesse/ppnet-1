@@ -13,65 +13,87 @@ angular.module('ppnetApp', [
   'ngCordova'
 ])
   .config(function($routeProvider) {
+    var access = routingConfig.accessLevels;
     // Route definitions
     $routeProvider
       .when('/login', {
         controller: 'LoginController',
-        templateUrl: 'views/login.html'
+        templateUrl: 'views/login.html',
+        access: access.anon
       })
       .when('/logout', {
         controller: 'LogoutController',
-        template: 'Logout...'
+        template: 'Logout...',
+        access: access.user
       })
       .when('/post/:id', {
         controller: 'SinglePostController',
-        templateUrl: 'views/singlePost.html'
+        templateUrl: 'views/singlePost.html',
+        access: access.user
       })
       .when('/hashtag', {
-        templateUrl: 'views/hashtag.html'
+        templateUrl: 'views/hashtag.html',
+        access: access.user
       })
       .when('/hashtag/:hashtag', {
         controller: 'HashtagController',
-        templateUrl: 'views/hashtag.html'
+        templateUrl: 'views/hashtag.html',
+        access: access.user
       })
       .when('/report', {
         controller: 'ReportController',
-        templateUrl: 'views/report.html'
+        templateUrl: 'views/report.html',
+        access: access.admin
       })
       .when('/timeline', {
         controller: 'TimelineController',
-        templateUrl: 'views/timeline.html'
+        templateUrl: 'views/timeline.html',
+        access: access.user
       })
       .when('/map', {
         controller: 'MapController',
-        templateUrl: 'views/map.html'
+        templateUrl: 'views/map.html',
+        access: access.user
       })
       .when('/map/:long/:lat/:zoom', {
         controller: 'MapController',
-        templateUrl: 'views/map.html'
+        templateUrl: 'views/map.html',
+        access: access.user
       })
       .when('/user/:id', {
         controller: 'UserController',
-        templateUrl: 'views/user.html'
+        templateUrl: 'views/user.html',
+        access: access.user
       })
       .when('/load', {
         controller: 'LoadController',
-        templateUrl: 'views/load.html'
+        templateUrl: 'views/load.html',
+        access: access.anon
       })
       .when('/codecatch', {
         templateUrl: 'views/codecatch.html',
-        controller: 'CodecatchCtrl'
+        controller: 'CodecatchCtrl',
+        access: access.user
       })
       .when('/helloworld', {
         templateUrl: 'views/helloworld.html',
-        controller: 'HelloworldCtrl'
+        controller: 'HelloworldCtrl',
+        access: access.user
+      })
+      .when('/schedule', {
+        templateUrl: 'views/schedule/index.html',
+        controller: 'ScheduleController',
+        access: access.public
       })
       .otherwise({
         controller: 'StreamController',
-        templateUrl: 'views/stream.html'
+        templateUrl: 'views/stream.html',
+        access: access.user
       });
   })
-    .run(function($rootScope, $http, ppnetUser, ppnetGeolocation, ppnetConfig, global_functions) {
+  .run(function($rootScope, $http, ppnetUser, ppnetGeolocation, ppnetConfig, global_functions, $location, $timeout) {
+    /* global $ */
+
     // Detect if application is running on phonegap
     $rootScope.phonegap = false;
     if (window.location.protocol === 'file:') {
@@ -80,26 +102,46 @@ angular.module('ppnetApp', [
 
     // Start Geolocation Watcher
     $(document).ready(function() {
-            if(!global_functions.isPhoneGap()) {
-                ppnetGeolocation.startGeoWatch();
-            } else {
-                onDeviceReady();
-            }
+      if (!global_functions.isPhoneGap()) {
+        ppnetGeolocation.startGeoWatch();
+      } else {
+//        onDeviceReady();
+      }
     });
 
     function onDeviceReady() {
-            document.addEventListener("deviceready", function() {
-                ppnetGeolocation.startGeoWatch();
-
-                if(global_functions.isIOS()) {
-                    $('body').addClass('phonegap-ios-7');
-                }
-            }, false);
+//      document.addEventListener('deviceready', function() {
+        ppnetGeolocation.startGeoWatch();
+        try {
+//          $timeout(function () {
+            $rootScope.gaPlugin = window.plugins.gaPlugin;
+//          $rootScope.gaPlugin.init(function(){alert('success')}, function(){alert('error')}, "UA-55069746-3", 1);
+          $rootScope.gaPlugin.init(function(){alert('success')}, function(){alert('error')}, "UA-55069746-4", 1);
+          $rootScope.gaPlugin.trackPage( function(){alert('success2')}, function(){alert('error2')}, "some.url.com");
+//            alert(JSON.stringify($rootScope.gaPlugin));
+//          },10000);
+        } catch (e) {
+          alert(e);
+        }
+        if (global_functions.isIOS()) {
+          $('body').addClass('phonegap-ios-7');
+        }
+//      }, false);
     }
 
+      document.addEventListener('deviceready', onDeviceReady, false);
+
+    $rootScope.$on("$routeChangeStart", function(event, next, current) {
+      if (!ppnetUser.authorize(next.access)) {
+        if (ppnetUser.isLoggedIn()) $location.path('/');
+        else $location.path('/login');
+      }
+    });
     if (!ppnetConfig.existingConfig()) {
-      window.location = '#/load';
+      ppnetConfig.loadConfigFromExternal().then(function(response) {
+        ppnetConfig.init(response.data);
+      });
     } else {
-      ppnetConfig.init();
+      ppnetConfig.init(null).then(function(response) {});
     }
   });

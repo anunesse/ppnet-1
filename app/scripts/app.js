@@ -112,13 +112,16 @@ angular.module('ppnetApp', [
     function onDeviceReady() {
       document.addEventListener('deviceready', function() {
         ppnetGeolocation.startGeoWatch();
-
+        try {
+          $rootScope.gaPlugin = window.plugins.gaPlugin;
+          $rootScope.gaPlugin.init(function(){/* success function*/}, function(){/* error function*/}, "UA-55069746-4", 10);
+        } catch (e) {/* If Google Analytics doesn't work, let the rest of the app work anyway*/
+        alert(e);}
         if (global_functions.isIOS()) {
           $('body').addClass('phonegap-ios-7');
         }
       }, false);
     }
-
 
     $rootScope.$on("$routeChangeStart", function(event, next, current) {
       if (!ppnetUser.authorize(next.access)) {

@@ -1,109 +1,108 @@
 'use strict';
 
 angular.module('ppnetApp')
-  .controller('LoginController', function($scope, $location, $routeParams, ppnetUser) {
 
-    var isCordovaApp = $scope.isCordovaApp = !!window.cordova;
+.controller('LoginController', function($scope, $location, $routeParams, ppnetUser, ppnetConfig) {
+  /* global hello, hello_phonegap */
+  $scope.LoginData = ppnetConfig.getLoginData();
 
-    // Login a user with random credentials. Only for Debugging.
-    $scope.login = function() {
-      var newUser = {
-        id: Math.ceil(Math.random() * 10000).toString(),
-        name: 'User' + Math.ceil(Math.random() * 10000),
-        provider: 'local'
-      };
-      ppnetUser.logout();
-      if (ppnetUser.login(newUser)) {
-        $location.path('');
-      }
+  var isCordovaApp = $scope.isCordovaApp = !!window.cordova;
+
+
+  $scope.fingerprintjsLogin = function() {
+    var newUser = {
+      id: new Fingerprint().get(),
+      name: $scope.simple.name,
+      provider: 'simple'
     };
-
-    $scope.enableSimpleLogin = true;
-    $scope.simpleLogin = function() {
-      var newUser = {
-        id: $scope.simple.id.toString(),
-        name: $scope.simple.name,
-        provider: 'simple'
-      };
-      ppnetUser.logout();
-      if (ppnetUser.login(newUser)) {
-        $location.path('');
-      }
+    console.log(newUser);
+    ppnetUser.logout();
+    if (ppnetUser.login(newUser)) {
+      $location.path('');
+    }
+  };
+  $scope.simpleLogin = function() {
+    var newUser = {
+      id: $scope.simple.id.toString(),
+      name: $scope.simple.name,
+      provider: 'simple'
     };
-
-    // Logs the User out if second url parameter is 'logout'
-    if ($routeParams.task === 'logout') {
-      hello().logout();
-      ppnetUser.logout();
-      $location.path('login');
+    ppnetUser.logout();
+    if (ppnetUser.login(newUser)) {
+      $location.path('');
     }
+  };
 
+  // Logs the User out if second url parameter is 'logout'
+  if ($routeParams.task === 'logout') {
+    hello().logout();
+    ppnetUser.logout();
+  }
 
-    var redirect_uri = (isCordovaApp) ? 'http://www.tobias-rotter.de/ppnet/redirect.html' : 'index.html';
-    var fiware = '320';
-    var facebook = '758204300873538';
-    var google = '971631219298-dgql1k3ia1qpkma6lfsrnt2cjevvg9fm.apps.googleusercontent.com';
-    var github = 'c6f5cd8c081419b33623';
-    var windows = '0000000048117AB3';
+  var redirect_uri = (isCordovaApp) ? 'http://www.tobias-rotter.de/ppnet/redirect.html' : 'index.html';
+  var fiware = '320';
+  var facebook = '758204300873538';
+  var google = '971631219298-dgql1k3ia1qpkma6lfsrnt2cjevvg9fm.apps.googleusercontent.com';
+  var github = 'c6f5cd8c081419b33623';
+  var windows = '0000000048117AB3';
 
-    if (isCordovaApp) {
-      hello_phonegap.init({
-        facebook: facebook,
-        fiware: fiware,
-        google: google,
-        github: github,
-        windows: windows
-      }, {
-        redirect_uri: redirect_uri
+  if (isCordovaApp) {
+    hello_phonegap.init({
+      facebook: facebook,
+      fiware: fiware,
+      google: google,
+      github: github,
+      windows: windows
+    }, {
+      redirect_uri: redirect_uri
+    });
+    hello_phonegap.on('auth.login', function(auth) {
+      // call user information, for the given network
+      hello_phonegap(auth.network).api('/me').success(function(r) {
+
+        var userdata = {
+          id: auth.network + '_' + r.id,
+          name: r.name,
+          provider: auth.network
+        };
+        ppnetUser.login(userdata);
       });
-      hello_phonegap.on('auth.login', function(auth) {
-        // call user information, for the given network
-        hello_phonegap(auth.network).api('/me').success(function(r) {
+    });
+  } else {
+    hello.init({
+      facebook: facebook,
+      fiware: fiware,
+      google: google,
+      github: github,
+      windows: windows
+    }, {
+      redirect_uri: redirect_uri
+    });
+    hello.on('auth.login', function(auth) {
+      // call user information, for the given network
+      hello(auth.network).api('/me').success(function(r) {
 
-          var userdata = {
-            id: auth.network + '_' + r.id,
-            name: r.name,
-            provider: auth.network
-          };
-          ppnetUser.login(userdata);
-        });
+        var userdata = {
+          id: auth.network + '_' + r.id,
+          name: r.name,
+          provider: auth.network
+        };
+        ppnetUser.login(userdata);
       });
-    } else {
-      hello.init({
-        facebook: facebook,
-        fiware: fiware,
-        google: google,
-        github: github,
-        windows: windows
-      }, {
-        redirect_uri: redirect_uri
-      });
-      hello.on('auth.login', function(auth) {
-        // call user information, for the given network
-        hello(auth.network).api('/me').success(function(r) {
-
-          var userdata = {
-            id: auth.network + '_' + r.id,
-            name: r.name,
-            provider: auth.network
-          };
-          ppnetUser.login(userdata);
-        });
-      });
-    }
+    });
+  }
 
 
 
-  });
+});
 'use strict';
 
 angular.module('ppnetApp')
-  .controller('LogoutController', function($scope, $location, ppnetUser) {
-    hello().logout();
-    ppnetUser.logout();
-    console.log('Logout');
-    $location.path('login');
-  });
+	.controller('LogoutController', function($scope, $location, ppnetUser) {
+		hello().logout();
+		ppnetUser.logout();
+		$location.path('login');
+	});
 'use strict';
 angular.module('ppnetApp')
   .controller('StreamController', function($scope, ppSyncService, ppnetPostHelper, ppnetUser) {
@@ -322,7 +321,7 @@ angular.module('ppnetApp')
 'use strict';
 
 angular.module('ppnetApp')
-  .controller('NewPostController', function($scope, $rootScope, ppSyncService, ppnetUser, ppnetPostHelper) {
+  .controller('NewPostController', function($scope, $rootScope, ppSyncService, ppnetUser, ppnetPostHelper, global_functions) {
 
     // Current User
     $scope.user = ppnetUser.getUserData();
@@ -437,6 +436,14 @@ angular.module('ppnetApp')
       navigator.camera.getPicture(captureSuccess, captureError, options);
     };
 
+    $scope.showUpload = function() {
+      if(global_functions.isPhoneGap()) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+
     // Function get called when file input changes
     $scope.processImage = function(image) {
       var file = image.files[0];
@@ -501,6 +508,45 @@ angular.module('ppnetApp')
       $scope.newComment.content = '';
     };
   });
+'use strict';
+angular.module('ppnetApp')
+    .controller('ScheduleController', function($scope, $http) {
+
+      $scope.agenda = [];
+
+      $scope.addEvent = function(event){
+        $scope.agenda.push(event);
+      };
+
+      function getJSONAgenda(){
+        $http.get("scripts/schedule.json")
+            .success(function(data){
+              $scope.agenda = data;
+            })
+            .error(function(data, status){
+              console.error("Enable to load agenda: "+status);
+            });
+      }
+
+      function getAgenda() {
+        $.getScript( "scripts/schedule.js" )
+        .done(function( script, textStatus ) {
+            $scope.agenda = agenda;
+            $scope.$digest();
+        })
+        .fail(function( jqxhr, settings, exception ) {
+            getJSONAgenda();
+        });
+      }
+
+      getAgenda();
+
+    })
+    .filter('time', function() {
+      return function(date) {
+        return new Date(date);
+      }
+    });
 'use strict';
 
 angular.module('ppnetApp')
@@ -1042,47 +1088,26 @@ angular.module('ppnetApp')
 angular.module('ppnetApp')
   .controller('LoadController', function($scope, $location, $routeParams, ppnetConfig, ppSyncService) {
 
-    ppnetConfig.loadConfigFromExternal().then(function(response) {
-        ppnetConfig.init(response.data);
-      },
-      function(error) {
-        console.log(error);
-      },
-      function(change) {
-        console.log(change);
-      });
+
   });
 'use strict';
 angular.module('ppnetApp')
-  .controller('configController', function($scope, $location, $routeParams, ppnetConfig, ppnetUser) {
+  .controller('configController', function($scope, $location, $routeParams, ppnetConfig, ppnetUser, $rootScope) {
 
+      $scope.plip=0;
     $scope.$watch(
       function() {
         return ppnetConfig.existingConfig();
       },
       function(newValue, oldValue) {
         if (newValue) {
-          setHeader(ppnetConfig.loadConfig());
+          $scope.config = ppnetConfig.loadConfig();
         }
       }
     );
 
-    $scope.logoutButtonClick = function() {
-      $scope.isLogedIn = false;
-    };
-
-    $scope.$watch(
-      function() {
-        return ppnetUser.isLogedIn();
-      },
-      function(newValue, oldValue) {
-        if (newValue) {
-          $scope.isLogedIn = newValue;
-        }
+      $scope.plop = function (){
+        $scope.plip++;
+        $rootScope.gaPlugin.trackEvent(function(){alert('success')}, function(){alert('error')}, "Button", "Click", "event only", 1);
       }
-    );
-
-    var setHeader = function(config) {
-      $scope.config = config;
-    }
   });
