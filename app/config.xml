@@ -24,6 +24,10 @@
         <param name="android-package" value="org.apache.cordova.filetransfer.FileTransfer" />
     </feature>
 
+  <feature name="GAPlugin" >
+    <param name="android-package" value="com.adobe.plugins.GAPlugin"/>
+  </feature>
+
     <access origin="*" />
     <access origin="http://127.0.0.1*"/> <!-- allow local pages -->
 
